@@ -14,6 +14,34 @@ class App extends Component {
     message: null
   }
 
+  unwrapEther = async () => {
+    try {
+      const [ account ] = await web3.eth.getAccounts()
+      const amount = this.state.amount
+
+      const txReceipt = await this.weth.methods
+        .deposit()
+        .send({
+          from: account,
+          value: web3.utils.fromWei(amount)
+        })
+
+      const { transactionHash } = txReceipt
+      this.setState({
+        message: (
+          <div>
+            <p>Unwraped { amount } Ether.</p>
+            <p>See transaction in EtherScan:<br />
+              <a href={ 'https://rinkeby.etherscan.io/tx/' + transactionHash }>{ transactionHash }</a></p>
+          </div>
+        )
+      })
+    } catch (e) {
+      console.error(e)
+      alert( e.message );
+    }
+  }
+
   wrapEther = async () => {
     try {
       const [ account ] = await web3.eth.getAccounts()
@@ -191,6 +219,7 @@ class App extends Component {
 
           <button onClick={ this.getBalances }>Get balances</button>
           <button onClick={ this.wrapEther }>Wrap Ether</button>
+          <button onClick={ this.unwrapEther }>Unwrap Ether</button>
           <button onClick={ this.setAllowance }>Set Allowance</button>
           <button onClick={ this.deposit }>Deposit</button>
         </header>
