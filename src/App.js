@@ -37,7 +37,7 @@ class App extends Component {
         )
       })
     } catch (e) {
-      alert( e.name );
+      console.error(e)
       alert( e.message );
     }
   }
@@ -79,7 +79,7 @@ class App extends Component {
         )
       })
     } catch (e) {
-      alert( e.name );
+      console.error(e)
       alert( e.message );
     }
   }
@@ -107,7 +107,7 @@ class App extends Component {
         )
       })
     } catch (e) {
-      alert( e.name );
+      console.error(e)
       alert( e.message );
     }
   }
@@ -163,7 +163,7 @@ class App extends Component {
         )
       })
     } catch (e) {
-      alert( e.name );
+      console.error(e)
       alert( e.message );
     }
 
