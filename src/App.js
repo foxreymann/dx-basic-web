@@ -15,26 +15,31 @@ class App extends Component {
   }
 
   wrapEther = async () => {
-    const [ account ] = await web3.eth.getAccounts()
-    const amount = this.state.amount
+    try {
+      const [ account ] = await web3.eth.getAccounts()
+      const amount = this.state.amount
 
-    const txReceipt = await this.weth.methods
-      .deposit()
-      .send({
-        from: account,
-        value: web3.utils.toWei(amount)
+      const txReceipt = await this.weth.methods
+        .deposit()
+        .send({
+          from: account,
+          value: web3.utils.toWei(amount)
+        })
+
+      const { transactionHash } = txReceipt
+      this.setState({
+        message: (
+          <div>
+            <p>Wraped { amount } Ether.</p>
+            <p>See transaction in EtherScan:<br />
+              <a href={ 'https://rinkeby.etherscan.io/tx/' + transactionHash }>{ transactionHash }</a></p>
+          </div>
+        )
       })
-
-    const { transactionHash } = txReceipt
-    this.setState({
-      message: (
-        <div>
-          <p>Wraped { amount } Ether.</p>
-          <p>See transaction in EtherScan:<br />
-            <a href={ 'https://rinkeby.etherscan.io/tx/' + transactionHash }>{ transactionHash }</a></p>
-        </div>
-      )
-    })
+    } catch (e) {
+      alert( e.name );
+      alert( e.message );
+    }
   }
 
   componentDidMount () {
@@ -53,99 +58,114 @@ class App extends Component {
   }
 
   setAllowance = async () => {
-    const [ account ] = await web3.eth.getAccounts()
-    const amount = this.state.amount
+    try {
+      const [ account ] = await web3.eth.getAccounts()
+      const amount = this.state.amount
 
-    const txReceipt = await this.weth.methods
-      .approve(addressDutchX, web3.utils.toWei(amount))
-      .send({
-        from: account
+      const txReceipt = await this.weth.methods
+        .approve(addressDutchX, web3.utils.toWei(amount))
+        .send({
+          from: account
+        })
+
+      const { transactionHash } = txReceipt
+      this.setState({
+        message: (
+          <div>
+            <p>Allowance changed to { amount }.</p>
+            <p>See transaction in EtherScan:<br />
+              <a href={ 'https://rinkeby.etherscan.io/tx/' + transactionHash }>{ transactionHash }</a></p>
+          </div>
+        )
       })
-
-    const { transactionHash } = txReceipt
-    this.setState({
-      message: (
-        <div>
-          <p>Allowance changed to { amount }.</p>
-          <p>See transaction in EtherScan:<br />
-            <a href={ 'https://rinkeby.etherscan.io/tx/' + transactionHash }>{ transactionHash }</a></p>
-        </div>
-      )
-    })
+    } catch (e) {
+      alert( e.name );
+      alert( e.message );
+    }
   }
 
   deposit = async () => {
-    const [ account ] = await web3.eth.getAccounts()
-    const amount = this.state.amount
+    try {
+      const [ account ] = await web3.eth.getAccounts()
+      const amount = this.state.amount
 
-    // See: https://github.com/gnosis/dx-contracts/blob/master/contracts/DutchExchange.sol#L351
-    const txReceipt = await this.dutchx.methods
-      .deposit(addressWeth, web3.utils.toWei(amount))
-      .send({
-        from: account
+      // See: https://github.com/gnosis/dx-contracts/blob/master/contracts/DutchExchange.sol#L351
+      const txReceipt = await this.dutchx.methods
+        .deposit(addressWeth, web3.utils.toWei(amount))
+        .send({
+          from: account
+        })
+
+      const { transactionHash } = txReceipt
+      this.setState({
+        message: (
+          <div>
+            <p>Deposited { amount } WETH into the DutchX.</p>
+            <p>See transaction in EtherScan:<br />
+              <a href={ 'https://rinkeby.etherscan.io/tx/' + transactionHash }>{ transactionHash }</a></p>
+          </div>
+        )
       })
-
-    const { transactionHash } = txReceipt
-    this.setState({
-      message: (
-        <div>
-          <p>Deposited { amount } WETH into the DutchX.</p>
-          <p>See transaction in EtherScan:<br />
-            <a href={ 'https://rinkeby.etherscan.io/tx/' + transactionHash }>{ transactionHash }</a></p>
-        </div>
-      )
-    })
+    } catch (e) {
+      alert( e.name );
+      alert( e.message );
+    }
   }
 
   getBalances = async () => {
-    const [ account ] = await web3.eth.getAccounts()
-    console.log('Get balances for %s', account)
+    try {
+      const [ account ] = await web3.eth.getAccounts()
+      console.log('Get balances for %s', account)
 
-    const etherBalancePromise = web3.eth
-      .getBalance(account)
-      .then(web3.utils.fromWei)
+      const etherBalancePromise = web3.eth
+        .getBalance(account)
+        .then(web3.utils.fromWei)
 
-    const wethBalancePromise = this.weth.methods
-      .balanceOf(account)
-      .call()
-      .then(web3.utils.fromWei)
+      const wethBalancePromise = this.weth.methods
+        .balanceOf(account)
+        .call()
+        .then(web3.utils.fromWei)
 
-    const wethAllowancePromise = this.weth.methods
-      .allowance(account, addressDutchX)
-      .call()
-      .then(web3.utils.fromWei)
+      const wethAllowancePromise = this.weth.methods
+        .allowance(account, addressDutchX)
+        .call()
+        .then(web3.utils.fromWei)
 
-    const dutchxBalancePromise = this.dutchx.methods
-      .balances(addressWeth, account)
-      .call()
-      .then(web3.utils.fromWei)
+      const dutchxBalancePromise = this.dutchx.methods
+        .balances(addressWeth, account)
+        .call()
+        .then(web3.utils.fromWei)
 
-    // Wait for all promises
-    const [
-      etherBalance,
-      wethBalance,
-      wethAllowance,
-      dutchxBalance,
-    ] = await Promise.all([
-      etherBalancePromise,
-      wethBalancePromise,
-      wethAllowancePromise,
-      dutchxBalancePromise,
-    ])
+      // Wait for all promises
+      const [
+        etherBalance,
+        wethBalance,
+        wethAllowance,
+        dutchxBalance,
+      ] = await Promise.all([
+        etherBalancePromise,
+        wethBalancePromise,
+        wethAllowancePromise,
+        dutchxBalancePromise,
+      ])
 
-    this.setState({
-      message: (
-        <div>
-          <strong>Balances</strong>
-          <ul>
-            <li><strong>Ether</strong>: { etherBalance }</li>
-            <li><strong>WETH balance</strong>: { wethBalance }</li>
-            <li><strong>WETH allowance for DutchX</strong>: { wethAllowance }</li>
-            <li><strong>Balance in DutchX</strong>: { dutchxBalance }</li>
-          </ul>
-        </div>
-      )
-    })
+      this.setState({
+        message: (
+          <div>
+            <strong>Balances</strong>
+            <ul>
+              <li><strong>Ether</strong>: { etherBalance }</li>
+              <li><strong>WETH balance</strong>: { wethBalance }</li>
+              <li><strong>WETH allowance for DutchX</strong>: { wethAllowance }</li>
+              <li><strong>Balance in DutchX</strong>: { dutchxBalance }</li>
+            </ul>
+          </div>
+        )
+      })
+    } catch (e) {
+      alert( e.name );
+      alert( e.message );
+    }
 
   }
 
